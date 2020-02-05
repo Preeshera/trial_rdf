@@ -1,7 +1,6 @@
 import tempfile, os
-
+import argparse
 import numpy as np
-
 import mdtraj as md
 
 try:
@@ -15,13 +14,23 @@ except ImportError:
     have_matplotlib = False
 
 
-traj = md.load('../nptpro.lammpstrj',top='../data2.pdb')
-print("Loaded")
-pairs = traj.top.select_pairs('name NTB', 'name OCS')
+parser = argparse.ArgumentParser(description='Generate the RDF g(f) of a lammpstrj file')
+parser.add_argument('--trajfile', help='Path to the lammpstrj file',required=True)
+parser.add_argument('--pdbfile', help='Path to the pdb file',required=True)
+parser.add_argument('--pairselect1', help='Atom selection query for first part of pair',required=True)
+parser.add_argument('--pairselect2', help='Atom selection query for first part of pair',required=True)
+parser.add_argument('--outdir', help='Directory to output files into', default='./output')
+parser.add_argument('--outname', help='Name for Output Files',default='rdf')
+
+args = parser.parse_args()
+
+traj = md.load(args.trajfile,top=args.pdbfile)
+print("Trajectory and Topology Loaded")
+pairs = traj.top.select_pairs(args.pairselect1, args.pairselect2)
 radii, rdf = md.geometry.rdf.compute_rdf(traj, pairs)
 print("Computed")
 
-outfile = './output/rdf.dat'
+outfile = args.outdir+'/'+args.outname+'.dat'
 with open(outfile, 'w') as output:
     for radius, gofr in zip(radii, rdf):
         output.write("{radius:8.3f} \t {gofr:8.3f}\n".format(**vars()))
@@ -34,6 +43,5 @@ if have_matplotlib:
     pylab.plot(radii, rdf, linewidth=3)
     pylab.xlabel(r"distance $r$ in $\AA$")
     pylab.ylabel(r"radial distribution function $g(r)$")
-    pylab.savefig("./figures/rdf.pdf")
-    pylab.savefig("./figures/rdf.png")
-    print ("Figure written to ./figures/rdf.{pdf,png}")
+    pylab.savefig(args.outdir+'/'+args.outname+'.pdf')
+    pylab.savefig(args.outdir+'/'+args.outname+'.png')
