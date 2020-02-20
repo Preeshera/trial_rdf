@@ -27,7 +27,7 @@ args = parser.parse_args()
 traj = md.load(args.trajfile,top=args.pdbfile)
 print("Trajectory and Topology Loaded")
 pairs = traj.top.select_pairs(args.pairselect1, args.pairselect2)
-radii, rdf = md.geometry.rdf.compute_rdf(traj, pairs)
+radii, rdf = md.geometry.rdf.compute_rdf(traj, pairs, r_range=(0.0,10.0),bin_width=0.1)
 print("Computed")
 
 outfile = args.outdir+'/'+args.outname+'.dat'
