@@ -1,0 +1,3 @@
+All should now be in correct units (Angstrom) and normalized (https://github.com/mdtraj/mdtraj/blob/e41a92299990fa6586a8f35739653a1801e33c31/mdtraj/geometry/rdf.py#L90-L92)
+
+Command to run (example): python mdtrajrdf.py --trajfile data/nptpro.lammpstrj --pdbfile data/data2.pdb --pairselect1 "name == NTB and index < 663" --pairselect2 "name == OCS and index >= 663 and index < 1326"
